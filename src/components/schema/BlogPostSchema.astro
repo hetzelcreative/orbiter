@@ -1,0 +1,63 @@
+---
+import { business } from '../../data/business';
+
+interface Props {
+  title: string;
+  description: string;
+  publishDate: Date;
+  updatedDate?: Date;
+  image?: string;
+  url: string;
+}
+
+const { title, description, publishDate, updatedDate, image, url } = Astro.props;
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description: description,
+  datePublished: publishDate.toISOString(),
+  ...(updatedDate && { dateModified: updatedDate.toISOString() }),
+  ...(image && { image: new URL(image, business.siteUrl).toString() }),
+  url: new URL(url, business.siteUrl).toString(),
+  author: {
+    '@type': 'Organization',
+    '@id': `${business.siteUrl}/#organization`,
+    name: business.name,
+  },
+  publisher: {
+    '@type': 'Organization',
+    '@id': `${business.siteUrl}/#organization`,
+    name: business.name,
+  },
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: `${business.siteUrl}/`,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Blog',
+      item: `${business.siteUrl}/blog/`,
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: title,
+      item: new URL(url, business.siteUrl).toString(),
+    },
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />

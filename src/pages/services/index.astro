@@ -1,0 +1,34 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { business } from "../../data/business";
+import { services } from "../../data/services";
+import Text from "../../components/ui/Text.astro";
+import Button from "../../components/ui/Button.astro";
+---
+
+<Layout
+  title="Services"
+  description={`Professional lawn care services offered by ${business.name} in ${business.address.city}, ${business.address.stateAbbr}.`}
+>
+  <section class="py-16 px-4">
+    <div class="max-w-4xl mx-auto">
+      <Text variant="h1" color="dark" className="mb-4">Our Services</Text>
+      <Text variant="lg" color="muted" className="mb-12">We offer a full range of professional lawn care services to keep your property looking its best.</Text>
+
+      <div class="space-y-8">
+        {services.map((service) => (
+          <a href={`/services/${service.slug}/`} class="block p-6 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+            <Text variant="h4" color="dark" className="mb-2">{service.name}</Text>
+            <Text color="muted">{service.excerpt}</Text>
+          </a>
+        ))}
+      </div>
+
+      <div class="mt-12 bg-primary-50 rounded-xl p-8 text-center">
+        <Text variant="h4" color="dark" className="mb-2">Need a Custom Solution?</Text>
+        <Text color="muted" className="mb-4">Contact us to discuss your specific needs.</Text>
+        <Button href="/contact/">Free Quote</Button>
+      </div>
+    </div>
+  </section>
+</Layout>

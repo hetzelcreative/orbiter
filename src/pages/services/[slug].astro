@@ -1,0 +1,47 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { business } from "../../data/business";
+import { services, getServiceBySlug } from "../../data/services";
+import Text from "../../components/ui/Text.astro";
+import Button from "../../components/ui/Button.astro";
+
+export function getStaticPaths() {
+  return services.map((service) => ({
+    params: { slug: service.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const service = getServiceBySlug(slug!)!;
+---
+
+<Layout
+  title={`${service.name} | ${business.address.city}, ${business.address.stateAbbr}`}
+  description={service.excerpt}
+>
+  <section class="py-16 px-4">
+    <div class="max-w-3xl mx-auto">
+      <a href="/services/" class="text-primary-600 text-sm hover:underline mb-4 inline-block">&larr; All Services</a>
+      <Text variant="h1" color="dark" className="mb-6">{service.name}</Text>
+      <Text variant="paragraph" className="mb-8">{service.description}</Text>
+
+      <div class="bg-primary-50 rounded-xl p-8 text-center">
+        <Text variant="h4" color="dark" className="mb-2">Ready to Get Started?</Text>
+        <Text color="muted" className="mb-4">Contact us today for a free quote on {service.name.toLowerCase()}.</Text>
+        <Button href="/contact/">Free Quote</Button>
+      </div>
+
+      <div class="mt-12">
+        <Text variant="h3" color="dark" className="mb-6">Our Other Services</Text>
+        <div class="grid sm:grid-cols-2 gap-4">
+          {services.filter((s) => s.slug !== slug).map((s) => (
+            <a href={`/services/${s.slug}/`} class="block p-4 border border-gray-100 rounded-lg hover:shadow-md transition-shadow">
+              <Text variant="base" color="dark" weight="semibold">{s.name}</Text>
+              <Text variant="sm" color="muted">{s.excerpt}</Text>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

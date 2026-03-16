@@ -1,0 +1,57 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { business } from "../data/business";
+import Text from "../components/ui/Text.astro";
+import Button from "../components/ui/Button.astro";
+---
+
+<Layout
+  title="Contact Us"
+  description={`Contact ${business.name} in ${business.address.city}, ${business.address.stateAbbr}. Call us at ${business.phoneFormatted}.`}
+>
+  <section class="py-16 px-4">
+    <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-12">
+      <div>
+        <Text variant="h1" color="dark" className="mb-6">Contact Us</Text>
+        <Text color="muted" className="mb-8">We'd love to hear from you. Reach out using any of the methods below or fill out the form.</Text>
+
+        <div class="space-y-4">
+          <div>
+            <Text variant="label" color="muted" className="mb-1">Address</Text>
+            <Text color="dark">{business.address.street}<br />{business.address.city}, {business.address.stateAbbr} {business.address.zip}</Text>
+          </div>
+          <div>
+            <Text variant="label" color="muted" className="mb-1">Phone</Text>
+            <a href={`tel:${business.phone}`} class="text-primary-600 hover:underline">{business.phoneFormatted}</a>
+          </div>
+          <div>
+            <Text variant="label" color="muted" className="mb-1">Email</Text>
+            <a href={`mailto:${business.email}`} class="text-primary-600 hover:underline">{business.email}</a>
+          </div>
+        </div>
+      </div>
+
+      <form class="space-y-4" name="contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="contact" />
+        <p class="hidden"><label>Don't fill this out: <input name="bot-field" /></label></p>
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <input type="text" id="name" name="name" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="email" name="email" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
+        </div>
+        <div>
+          <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          <input type="tel" id="phone" name="phone" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
+        </div>
+        <div>
+          <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+          <textarea id="message" name="message" rows="4" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"></textarea>
+        </div>
+        <Button type="submit" className="w-full">Send Message</Button>
+      </form>
+    </div>
+  </section>
+</Layout>

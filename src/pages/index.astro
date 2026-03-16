@@ -1,0 +1,251 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import { business } from "../data/business";
+import Text from "../components/ui/Text.astro";
+import Button from "../components/ui/Button.astro";
+import Section from "../components/ui/Section.astro";
+import SectionTitle from "../components/ui/SectionTitle.astro";
+import { services } from "../data/services";
+import heroImage from "../assets/Resized_20240614_125612_1718388163452.JPEG";
+import imgAbout from "../assets/Resized_20240614_141408_1718392493946.JPEG";
+import imgFamily from "../assets/family.jpeg";
+import imgCta from "../assets/Resized_20240725_103324_1721921613656.JPEG";
+import imgMowing from "../assets/Resized_20240503_154235_1714768964347.JPEG";
+import imgTreatment from "../assets/Resized_20240510_112755_1715358515041.JPEG";
+import imgAeration from "../assets/Resized_20240612_122829_1718213368933.JPEG";
+import imgOverseeding from "../assets/Resized_20240517_130948_1715969405371.JPEG";
+import imgSpring from "../assets/Resized_20240409_142926_1712691166529.JPEG";
+import imgFall from "../assets/Resized_20240614_102132_1718388169770.JPEG";
+
+const serviceImages: Record<string, ImageMetadata> = {
+  'lawn-mowing': imgMowing,
+  'lawn-treatment-programs': imgTreatment,
+  'aeration': imgAeration,
+  'overseeding': imgOverseeding,
+  'spring-cleanup': imgSpring,
+  'fall-cleanup': imgFall,
+};
+---
+
+<Layout
+  title={`Trusted ${business.tagline} in ${business.address.city}, ${business.address.stateAbbr} | ${business.name}`}
+  description={business.description}
+>
+  <!-- Hero -->
+  <section class="relative text-white py-32 md:py-44 px-4">
+    <Image
+      src={heroImage}
+      alt=""
+      class="absolute inset-0 w-full h-full object-cover"
+      widths={[640, 1024, 1440, 1920]}
+      sizes="100vw"
+      loading="eager"
+      quality={60}
+    />
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="relative max-w-4xl mx-auto text-center">
+      <Text variant="h1" color="white" className="mb-4">Trusted Glenwood Lawn Care Company</Text>
+      <Text variant="xl" color="whiteMuted" className="mb-8">{business.tagline}</Text>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href="/contact/" variant="primary">Free Quote</Button>
+        <Button href={`tel:${business.phone}`} variant="outline-white">Call {business.phoneFormatted}</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <Section variant="primary-dark" padding="compact">
+    <div class="max-w-6xl mx-auto flex flex-wrap justify-center md:justify-between items-center gap-y-6 text-center md:divide-x md:divide-white/20">
+      <div class="flex flex-col items-center gap-2 px-8">
+        <svg class="size-8 text-primary-400" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+        <Text variant="sm" color="white" weight="semibold" as="span">16+ Years Serving {business.address.city}</Text>
+      </div>
+      <div class="flex flex-col items-center gap-2 px-8">
+        <svg class="size-8 text-primary-400" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+        <Text variant="sm" color="white" weight="semibold" as="span">Licensed & Insured</Text>
+      </div>
+      <div class="flex flex-col items-center gap-2 px-8">
+        <svg class="size-8 text-primary-400" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+        <Text variant="sm" color="white" weight="semibold" as="span">Residential Specialists</Text>
+      </div>
+      <div class="flex flex-col items-center gap-2 px-8">
+        <svg class="size-8 text-primary-400" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+        <Text variant="sm" color="white" weight="semibold" as="span">Locally Owned</Text>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Services Overview -->
+  <Section>
+    <div class="max-w-6xl mx-auto">
+      <SectionTitle
+        title="What We Do"
+        description="From weekly mowing to full-season treatment programs, we handle the work so you don't have to."
+        className="mb-12"
+      />
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {services.map((service) => (
+          <a href={`/services/${service.slug}/`} class="group rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow">
+            <div class="relative h-48 overflow-hidden">
+              <Image
+                src={serviceImages[service.slug]}
+                alt={service.name}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                widths={[400, 600]}
+                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                quality={70}
+              />
+            </div>
+            <div class="p-5">
+              <Text variant="h4" color="dark" className="mb-2">{service.name}</Text>
+              <Text variant="sm" color="muted">{service.excerpt}</Text>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="text-center mt-10">
+        <Button href="/services/">See All Services</Button>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Why Buthe's Turf -->
+  <Section variant="light">
+    <div class="max-w-6xl mx-auto md:grid md:grid-cols-2 md:gap-16 md:items-center">
+      <div>
+        <SectionTitle title="Built for In-Town Yards" align="left" className="mb-6" />
+        <Text variant="paragraph" className="mb-4">
+          Buthe's Turf isn't trying to be everything to everyone. We're optimized for residential lots right here in Glenwood — smaller rigs, tighter schedules, and 16 years of experience on the kinds of yards most people actually have.
+        </Text>
+        <Text variant="paragraph" className="mb-8">
+          No huge acreages, no crew you've never met. Just consistent, reliable lawn care from a company that knows your neighborhood.
+        </Text>
+        <Button href="/contact/">Get a Free Quote</Button>
+      </div>
+      <div class="hidden md:block">
+        <Image
+          src={imgAbout}
+          alt="Freshly mowed lawn in Glenwood"
+          class="rounded-xl w-full h-auto"
+          widths={[400, 600, 800]}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          quality={70}
+        />
+      </div>
+    </div>
+  </Section>
+
+  <!-- Social Proof -->
+  <Section>
+    <div class="max-w-6xl mx-auto">
+      <SectionTitle title="What Our Customers Say" className="mb-12" />
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {[
+          { name: "Sarah M.", location: "Glenwood", initial: "S", color: "bg-primary-600", text: "Adam and his team have taken care of our lawn for years. Always on time, always looks great. Wouldn't use anyone else." },
+          { name: "Mike R.", location: "Glenwood", initial: "M", color: "bg-secondary-500", text: "Best lawn service in town. Our yard has never looked better since switching to Buthe's. The treatment program really made a difference." },
+          { name: "Jennifer L.", location: "Glenwood", initial: "J", color: "bg-primary-dark", text: "Reliable, fair pricing, and they actually care about how the yard looks. Highly recommend for anyone in the Glenwood area." },
+          { name: "Dave K.", location: "Glenwood", initial: "D", color: "bg-secondary-700", text: "We've used Buthe's Turf for three seasons now. The aeration and overseeding transformed our backyard. Can't say enough good things." },
+          { name: "Lisa T.", location: "Pacific Junction", initial: "L", color: "bg-primary-600", text: "So happy we found Adam. He's honest, does great work, and his prices are very fair. Our neighbors even switched after seeing our lawn." },
+          { name: "Brian W.", location: "Glenwood", initial: "B", color: "bg-secondary-500", text: "Professional and dependable. They show up when they say they will, and the lawn always looks sharp. Highly recommend." },
+        ].map((review) => (
+          <div class="p-6 border border-gray-100 rounded-xl shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <div class:list={["size-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0", review.color]}>
+                {review.initial}
+              </div>
+              <div class="flex flex-col">
+                <Text variant="sm" color="dark" weight="semibold" as="span">{review.name}</Text>
+                <Text variant="sm" color="muted" as="span">{review.location}</Text>
+              </div>
+              <div class="flex items-center gap-0.5 ml-auto">
+                <svg class="size-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                <svg class="size-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                <svg class="size-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                <svg class="size-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                <svg class="size-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+              </div>
+            </div>
+            <Text variant="base" color="default" className="italic">"{review.text}"</Text>
+          </div>
+        ))}
+      </div>
+      {business.googleReviewUrl && (
+        <div class="text-center mt-10">
+          <Button href={business.googleReviewUrl} className="gap-3">
+            <svg class="size-5" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
+            View All Google Reviews
+          </Button>
+        </div>
+      )}
+    </div>
+  </Section>
+
+  <!-- About Snapshot -->
+  <Section variant="primary-dark">
+    <div class="max-w-6xl mx-auto md:grid md:grid-cols-2 md:gap-16 md:items-center">
+      <div>
+        <SectionTitle title="Locally Owned. Community Focused." color="white" lineColor="white" align="left" className="mb-6" />
+        <Text variant="paragraph" color="whiteMuted" className="mb-4">
+          Adam Buthe started mowing lawns part-time in 2010 while coaching wrestling at Glenwood High School. What began as a side job grew into a full-time operation built on word-of-mouth, honest work, and showing up when he says he will.
+        </Text>
+        <Text variant="paragraph" color="whiteMuted" className="mb-8">
+          Today, Buthe's Turf serves homeowners throughout Glenwood and Southwest Iowa — and Adam still coaches, still raises his family here, and still treats every yard like it's his own.
+        </Text>
+        <Button href="/about/" variant="outline-white">Learn More About Us</Button>
+      </div>
+      <div class="hidden md:block">
+        <Image
+          src={imgFamily}
+          alt="The Buthe family"
+          class="rounded-xl w-full h-auto"
+          widths={[400, 600, 800]}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          quality={70}
+        />
+      </div>
+    </div>
+  </Section>
+
+  <!-- Service Area -->
+  <Section>
+    <div class="max-w-4xl mx-auto text-center">
+      <SectionTitle
+        title="Serving Glenwood and Surrounding Communities"
+        description="We serve homeowners throughout Southwest Iowa, including Council Bluffs, Malvern, Red Oak, and more."
+        className="mb-8"
+      />
+      <div class="flex flex-wrap justify-center gap-3">
+        {business.serviceArea.map((city) => (
+          <span class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">{city}</span>
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  <!-- Final CTA Banner -->
+  <section class="relative py-24 md:py-32 px-4">
+    <Image
+      src={imgCta}
+      alt=""
+      class="absolute inset-0 w-full h-full object-cover"
+      widths={[640, 1024, 1440, 1920]}
+      sizes="100vw"
+      quality={50}
+    />
+    <div class="absolute inset-0 bg-primary-dark/85"></div>
+    <div class="relative max-w-3xl mx-auto text-center">
+      <SectionTitle
+        title="Ready for a Lawn You Can Be Proud Of?"
+        description="Call or text us to get started. We respond within the business day."
+        color="white"
+        lineColor="white"
+        className="mb-8"
+      />
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href={`tel:${business.phone}`} variant="outline-white">{business.phoneFormatted}</Button>
+        <Button href="/contact/" variant="secondary">Request Service</Button>
+      </div>
+    </div>
+  </section>
+</Layout>

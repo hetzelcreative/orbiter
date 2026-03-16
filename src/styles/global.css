@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Poppins', sans-serif;
+
+  --color-primary-50: #f0f9e8;
+  --color-primary-100: #ddf0c8;
+  --color-primary-200: #bbe19a;
+  --color-primary-300: #93cd66;
+  --color-primary-400: #6db83e;
+  --color-primary-500: #519a24;
+  --color-primary-600: #438018;
+  --color-primary-700: #366612;
+  --color-primary-800: #2b5110;
+  --color-primary-900: #1f3b0b;
+  --color-primary-950: #122306;
+
+  --color-secondary-50: #e8f4fc;
+  --color-secondary-100: #c8e5f8;
+  --color-secondary-200: #8dcaef;
+  --color-secondary-300: #4daee5;
+  --color-secondary-400: #1a94d6;
+  --color-secondary-500: #027ba6;
+  --color-secondary-600: #026589;
+  --color-secondary-700: #024f6b;
+  --color-secondary-800: #013a4f;
+  --color-secondary-900: #012634;
+  --color-secondary-950: #00141c;
+
+  --color-primary-dark: #18430b;
+  --color-primary-darker: #112e09;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* z-index above Tailwind's default max (z-50) for mobile menu overlay */
+.z-60 {
+  z-index: 60;
+}

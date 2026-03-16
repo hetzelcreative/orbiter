@@ -1,0 +1,25 @@
+---
+import { business } from '../../data/business';
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: business.name,
+    url: business.siteUrl,
+    telephone: business.phoneFormatted,
+    email: business.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: business.address.street,
+      addressLocality: business.address.city,
+      addressRegion: business.address.stateAbbr,
+      postalCode: business.address.zip,
+      addressCountry: business.address.country,
+    },
+    foundingDate: business.founded,
+    sameAs: Object.values(business.socialProfiles),
+  })}
+/>

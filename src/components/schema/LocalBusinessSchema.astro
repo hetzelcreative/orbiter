@@ -1,0 +1,59 @@
+---
+import { business } from '../../data/business';
+
+const hours = Object.entries(business.hours).map(([day, time]) => {
+  if (time === 'Closed') return null;
+  const dayMap: Record<string, string> = {
+    monday: 'Monday',
+    tuesday: 'Tuesday',
+    wednesday: 'Wednesday',
+    thursday: 'Thursday',
+    friday: 'Friday',
+    saturday: 'Saturday',
+    sunday: 'Sunday',
+  };
+  const parts = time.replace(/\s/g, '').split('–');
+  if (parts.length !== 2) return null;
+  return {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: dayMap[day],
+    opens: parts[0],
+    closes: parts[1],
+  };
+}).filter(Boolean);
+---
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': `${business.siteUrl}/#organization`,
+    name: business.name,
+    legalName: business.legalName,
+    url: business.siteUrl,
+    description: business.description,
+    telephone: business.phone,
+    email: business.email,
+    priceRange: business.priceRange,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: business.address.street,
+      addressLocality: business.address.city,
+      addressRegion: business.address.stateAbbr,
+      postalCode: business.address.zip,
+      addressCountry: business.address.country,
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: business.geo.lat,
+      longitude: business.geo.lng,
+    },
+    openingHoursSpecification: hours,
+    areaServed: business.serviceArea.map((city) => ({
+      '@type': 'City',
+      name: city,
+    })),
+    sameAs: Object.values(business.socialProfiles),
+  })}
+/>

@@ -1,0 +1,50 @@
+---
+import { business } from '../../data/business';
+import type { ProcessedReview } from '../../utils/googleReviews';
+
+interface Props {
+  reviews: ProcessedReview[];
+}
+
+const { reviews } = Astro.props;
+
+const reviewSchemas = reviews.map((review) => ({
+  '@type': 'Review',
+  author: {
+    '@type': 'Person',
+    name: review.name,
+    ...(review.profileUrl && { url: review.profileUrl }),
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: review.rating.toString(),
+    bestRating: '5',
+    worstRating: '1',
+  },
+  reviewBody: review.text,
+  datePublished: new Date(review.timestamp).toISOString(),
+  itemReviewed: {
+    '@type': 'LocalBusiness',
+    '@id': `${business.siteUrl}/#organization`,
+    name: business.name,
+    telephone: business.phone,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: business.address.street,
+      addressLocality: business.address.city,
+      addressRegion: business.address.stateAbbr,
+      postalCode: business.address.zip,
+      addressCountry: business.address.country,
+    },
+  },
+}));
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': reviewSchemas,
+};
+---
+
+{reviews.length > 0 && (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+)}

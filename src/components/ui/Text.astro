@@ -1,0 +1,95 @@
+---
+interface Props {
+  variant?:
+    | 'default'
+    | 'sm'
+    | 'base'
+    | 'lg'
+    | 'xl'
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'label'
+    | 'paragraph';
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div';
+  color?: 'default' | 'muted' | 'dark' | 'white' | 'whiteMuted' | 'primary' | 'secondary';
+  weight?: 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold';
+  align?: 'left' | 'center' | 'right';
+  className?: string;
+}
+
+const {
+  variant = 'default',
+  as,
+  color = 'default',
+  weight,
+  align,
+  className = '',
+} = Astro.props;
+
+const variants: Record<string, string> = {
+  default: 'text-base md:text-lg leading-relaxed',
+  sm: 'text-sm',
+  base: 'text-base leading-snug',
+  lg: 'text-base md:text-lg leading-relaxed',
+  xl: 'text-lg md:text-xl',
+  h1: 'text-4xl sm:text-5xl md:text-[75px] font-bold leading-tight font-heading',
+  h2: 'text-3xl sm:text-4xl md:text-5xl font-bold leading-tight font-heading',
+  h3: 'text-2xl md:text-3xl font-bold leading-tight font-heading',
+  h4: 'text-xl md:text-2xl font-bold leading-tight font-heading',
+  label: 'font-heading font-semibold text-sm uppercase tracking-widest',
+  paragraph: 'text-base md:text-lg leading-relaxed',
+};
+
+const colors: Record<string, string> = {
+  default: 'text-gray-700',
+  muted: 'text-gray-500',
+  dark: 'text-gray-900',
+  white: 'text-white',
+  whiteMuted: 'text-white/80',
+  primary: 'text-primary-600',
+  secondary: 'text-secondary-500',
+};
+
+const weights: Record<string, string> = {
+  normal: 'font-normal',
+  medium: 'font-medium',
+  semibold: 'font-semibold',
+  bold: 'font-bold',
+  extrabold: 'font-extrabold',
+};
+
+const alignments: Record<string, string> = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right',
+};
+
+const classes = [
+  variants[variant],
+  colors[color],
+  weight ? weights[weight] : '',
+  align ? alignments[align] : '',
+  className,
+].filter(Boolean).join(' ');
+
+const defaultTag =
+  variant === 'h1' ? 'h1'
+  : variant === 'h2' ? 'h2'
+  : variant === 'h3' ? 'h3'
+  : variant === 'h4' ? 'h4'
+  : 'p';
+
+const Tag = as || defaultTag;
+---
+
+{Tag === 'h1' && <h1 class={classes}><slot /></h1>}
+{Tag === 'h2' && <h2 class={classes}><slot /></h2>}
+{Tag === 'h3' && <h3 class={classes}><slot /></h3>}
+{Tag === 'h4' && <h4 class={classes}><slot /></h4>}
+{Tag === 'h5' && <h5 class={classes}><slot /></h5>}
+{Tag === 'h6' && <h6 class={classes}><slot /></h6>}
+{Tag === 'p' && <p class={classes}><slot /></p>}
+{Tag === 'span' && <span class={classes}><slot /></span>}
+{Tag === 'div' && <div class={classes}><slot /></div>}

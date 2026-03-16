@@ -1,0 +1,281 @@
+---
+import type { NavItem } from '../../data/navigation';
+
+interface Props {
+  navItems: NavItem[];
+  currentPath: string;
+}
+
+const { navItems, currentPath } = Astro.props;
+
+const isActive = (href: string) => {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+};
+---
+
+<nav class="flex items-center min-w-0">
+  <div class="flex items-center gap-10 min-w-0" data-priority-nav>
+    <!-- Visible row -->
+    <div class="flex items-center gap-10 min-w-0 whitespace-nowrap" data-row></div>
+
+    <!-- More dropdown -->
+    <div class="relative group shrink-0" data-more hidden>
+      <button class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide font-heading text-gray-500 hover:text-gray-900 transition-colors cursor-pointer">
+        More
+        <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+
+      <!-- Invisible hover bridge -->
+      <div class="absolute left-0 right-0 top-full h-3"></div>
+
+      <div
+        class="absolute top-full -left-5 mt-3 w-auto whitespace-nowrap bg-white rounded-sm shadow-xl overflow-visible z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-200"
+      >
+        <div data-overflow></div>
+      </div>
+    </div>
+
+    <!-- CTA slot (always rightmost) -->
+    <div class="flex items-center shrink-0" data-cta-slot></div>
+
+    <!-- Source: rendered once, JS distributes into row/overflow/cta -->
+    <div class="hidden" data-source>
+      {navItems.map((item) => {
+        const hasChildren = item.children && item.children.length > 0;
+
+        if (hasChildren) {
+          const parentActive = item.children!.some((child) => isActive(child.href)) || isActive(item.href);
+          return (
+            <div class="relative group" data-item>
+              <button class:list={["flex items-center gap-2 text-sm font-semibold uppercase tracking-wide font-heading hover:text-gray-900 transition-colors cursor-pointer py-3.5", parentActive ? "text-gray-900" : "text-gray-500"]}>
+                {item.label}
+                <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <!-- Invisible hover bridge -->
+              <div class="absolute left-0 right-0 top-full h-3" />
+
+              <div class="absolute top-full -left-5 mt-0 w-auto whitespace-nowrap bg-white rounded-sm shadow-xl overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-200 py-3">
+                {item.children!.map((child) => (
+                  <a
+                    href={child.href}
+                    class:list={["block px-5 py-2.5 text-xs font-semibold uppercase tracking-wide font-heading hover:text-white hover:bg-secondary-500 transition-colors", isActive(child.href) ? "text-gray-900" : "text-gray-500"]}
+                  >
+                    {child.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        const active = isActive(item.href);
+        return (
+          <a
+            href={item.href}
+            class:list={["flex items-center text-sm font-semibold uppercase tracking-wide font-heading hover:text-gray-900 transition-colors py-3.5", active ? "text-gray-900" : "text-gray-500"]}
+            {...(active ? { "aria-current": "page" } : {})}
+            data-item
+          >
+            {item.label}
+          </a>
+        );
+      })}
+    </div>
+
+    <script is:inline>
+      (() => {
+        const root = document.currentScript?.closest('[data-priority-nav]');
+        if (!root) return;
+
+        const row = root.querySelector('[data-row]');
+        const source = root.querySelector('[data-source]');
+        const ctaSlot = root.querySelector('[data-cta-slot]');
+        const more = root.querySelector('[data-more]');
+        const overflow = root.querySelector('[data-overflow]');
+
+        if (!row || !source || !ctaSlot || !more || !overflow) return;
+
+        const ctaSelector = '[data-cta="true"]';
+        const overflowLinkClass =
+          'block px-5 py-2.5 text-xs font-semibold uppercase tracking-wide font-heading text-gray-500 hover:text-white hover:bg-secondary-500 transition-colors';
+
+        const isPlainAnchor = (el) => el && el.tagName === 'A' && !el.matches(ctaSelector);
+        const isDropdownItem = (el) => el && el.dataset?.item !== undefined && el.querySelector('button');
+
+        const storeOriginalClassOnce = (el) => {
+          if (!el || el.nodeType !== 1) return;
+          if (el.dataset && el.dataset.originalClass == null) {
+            el.dataset.originalClass = el.getAttribute('class') || '';
+          }
+        };
+
+        const setInOverflow = (el, inOverflow) => {
+          if (isPlainAnchor(el)) {
+            storeOriginalClassOnce(el);
+            el.setAttribute('class', inOverflow ? overflowLinkClass : (el.dataset.originalClass || ''));
+          }
+          if (isDropdownItem(el)) {
+            if (inOverflow) {
+              el.dataset.inOverflow = 'true';
+            } else {
+              delete el.dataset.inOverflow;
+            }
+          }
+        };
+
+        Array.from(source.children).forEach((el) => {
+          if (el.matches?.(ctaSelector)) {
+            ctaSlot.appendChild(el);
+          } else {
+            storeOriginalClassOnce(el);
+            row.appendChild(el);
+            setInOverflow(el, false);
+          }
+        });
+
+        const getGapPx = (el) => {
+          const cs = getComputedStyle(el);
+          return parseFloat(cs.columnGap || cs.gap || '0px') || 0;
+        };
+
+        const childrenWidth = (container) => {
+          const kids = Array.from(container.children);
+          if (!kids.length) return 0;
+          const gap = getGapPx(container);
+          const widths = kids.reduce((sum, el) => sum + el.getBoundingClientRect().width, 0);
+          return widths + gap * Math.max(0, kids.length - 1);
+        };
+
+        const fits = () => {
+          const gap = getGapPx(root);
+          const rowW = childrenWidth(row);
+          const ctaW = childrenWidth(ctaSlot);
+          const moreW = more.hidden ? 0 : more.getBoundingClientRect().width;
+          const needed = rowW + (row.children.length ? gap : 0) + (more.hidden ? 0 : moreW + gap) + ctaW;
+          return needed <= root.getBoundingClientRect().width;
+        };
+
+        const ensureCtaAtEnd = () => {
+          const cta = ctaSlot.querySelector(ctaSelector) || overflow.querySelector(ctaSelector) || row.querySelector(ctaSelector);
+          if (cta && cta.parentElement !== ctaSlot) ctaSlot.appendChild(cta);
+        };
+
+        const moveToOverflow = (el) => {
+          overflow.insertBefore(el, overflow.firstChild);
+          setInOverflow(el, true);
+        };
+
+        const moveToRow = (el) => {
+          row.appendChild(el);
+          setInOverflow(el, false);
+        };
+
+        const layout = () => {
+          ensureCtaAtEnd();
+          more.hidden = overflow.children.length === 0;
+
+          while (!fits()) {
+            const rowKids = Array.from(row.children);
+            const last = rowKids[rowKids.length - 1];
+            if (!last) break;
+            moveToOverflow(last);
+            more.hidden = false;
+          }
+
+          while (overflow.firstElementChild) {
+            const candidate = overflow.firstElementChild;
+            moveToRow(candidate);
+            if (!fits()) {
+              moveToOverflow(candidate);
+              break;
+            }
+          }
+
+          more.hidden = overflow.children.length === 0;
+          ensureCtaAtEnd();
+        };
+
+        window.addEventListener('resize', () => requestAnimationFrame(layout), { passive: true });
+
+        const ro = new ResizeObserver(() => requestAnimationFrame(layout));
+        ro.observe(root);
+
+        if (document.fonts?.ready) {
+          document.fonts.ready.then(() => requestAnimationFrame(layout)).catch(() => {});
+        }
+
+        requestAnimationFrame(layout);
+      })();
+    </script>
+  </div>
+</nav>
+
+<style>
+  [data-in-overflow='true'] > div:nth-child(3) {
+    position: absolute;
+    left: auto !important;
+    right: 100% !important;
+    margin-right: 0.5rem;
+    margin-top: 0 !important;
+    top: 0 !important;
+    background-color: white;
+    border-radius: 0.125rem;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+    overflow: hidden;
+    width: 14rem;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms, visibility 200ms;
+    border: 1px solid rgb(229 231 235);
+  }
+
+  [data-in-overflow='true']:hover > div:nth-child(3) {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  [data-in-overflow='true'] > button {
+    width: 100%;
+    padding: 0.625rem 1.25rem;
+    color: rgb(107 114 128);
+    font-weight: 600;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    transition-property: color, background-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    display: flex;
+    align-items: center;
+    border-radius: 0;
+  }
+
+  [data-in-overflow='true'] > button:hover {
+    background-color: var(--color-secondary-500);
+    color: white;
+  }
+
+  [data-in-overflow='true'] > div:nth-child(2) {
+    display: none;
+  }
+
+  [data-in-overflow='true'] > button svg {
+    display: none;
+  }
+
+  [data-in-overflow='true'] > button::before {
+    content: '+';
+    font-size: 1.25rem;
+    font-weight: 300;
+    line-height: 1;
+    margin-right: 0.5rem;
+  }
+</style>
