@@ -4,17 +4,20 @@ import { business } from "../../data/business";
 import { services } from "../../data/services";
 import Text from "../../components/ui/Text.astro";
 import Button from "../../components/ui/Button.astro";
+import Section from "../../components/ui/Section.astro";
+import PageHero from "../../components/ui/PageHero.astro";
 ---
 
 <Layout
   title="Services"
   description={`Professional lawn care services offered by ${business.name} in ${business.address.city}, ${business.address.stateAbbr}.`}
 >
-  <section class="py-16 px-4">
-    <div class="max-w-4xl mx-auto">
-      <Text variant="h1" color="dark" className="mb-4">Our Services</Text>
-      <Text variant="lg" color="muted" className="mb-12">We offer a full range of professional lawn care services to keep your property looking its best.</Text>
-
+  <PageHero
+    title="Our Services"
+    description="We offer a full range of professional lawn care services to keep your property looking its best."
+  />
+  <Section>
+    <div class="max-w-7xl mx-auto">
       <div class="space-y-8">
         {services.map((service) => (
           <a href={`/services/${service.slug}/`} class="block p-6 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -30,5 +33,5 @@ import Button from "../../components/ui/Button.astro";
         <Button href="/contact/">Free Quote</Button>
       </div>
     </div>
-  </section>
+  </Section>
 </Layout>

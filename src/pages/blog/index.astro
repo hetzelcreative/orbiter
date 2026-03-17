@@ -3,6 +3,8 @@ import Layout from "../../layouts/Layout.astro";
 import { business } from "../../data/business";
 import { getCollection } from "astro:content";
 import Text from "../../components/ui/Text.astro";
+import Section from "../../components/ui/Section.astro";
+import PageHero from "../../components/ui/PageHero.astro";
 
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -13,36 +15,43 @@ const posts = (await getCollection("blog")).sort(
   title="Blog"
   description={`Read the latest articles, tips, and updates from ${business.name}.`}
 >
-  <section class="py-16 px-4">
-    <div class="max-w-4xl mx-auto">
-      <Text variant="h1" color="dark" className="mb-12">Blog</Text>
-
+  <PageHero
+    title="Blog"
+    description="Tips, updates, and insights about lawn care and our community."
+  />
+  <Section>
+    <div class="max-w-7xl mx-auto">
       {posts.length === 0 && (
         <Text color="muted">No posts yet. Check back soon!</Text>
       )}
 
-      <div class="space-y-8">
+      <div class="grid md:grid-cols-2 gap-8">
         {posts.map((post) => (
-          <article class="border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <article class="group border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
             <a href={`/blog/${post.id}/`}>
-              <Text variant="sm" color="muted" as="span">
-                <time datetime={post.data.pubDate.toISOString()}>
-                  {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                </time>
-              </Text>
-              <Text variant="h4" color="dark" className="mt-1 mb-2 hover:text-primary-600 transition-colors">{post.data.title}</Text>
-              <Text variant="sm" color="muted">{post.data.description}</Text>
-              {post.data.tags.length > 0 && (
-                <div class="flex gap-2 mt-3">
-                  {post.data.tags.map((tag: string) => (
-                    <span class="text-xs bg-primary-50 text-primary-700 px-2 py-1 rounded-full">{tag}</span>
-                  ))}
+              {post.data.image && (
+                <div class="relative h-52 overflow-hidden">
+                  <img
+                    src={post.data.image}
+                    alt={post.data.title}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
                 </div>
               )}
+              <div class="p-6">
+                <Text variant="sm" color="muted" as="span">
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                  </time>
+                </Text>
+                <Text variant="h4" color="dark" className="mt-1 mb-2 group-hover:text-primary-600 transition-colors">{post.data.title}</Text>
+                <Text variant="sm" color="muted">{post.data.description}</Text>
+              </div>
             </a>
           </article>
         ))}
       </div>
     </div>
-  </section>
+  </Section>
 </Layout>

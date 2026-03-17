@@ -2,7 +2,7 @@
 title: "Welcome to Our Blog"
 description: "We're excited to launch our new blog where we'll share tips, updates, and insights about our services and community."
 pubDate: 2024-01-15
-tags: ["news", "community"]
+image: "/blog/welcome.jpg"
 author: "Staff"
 ---
 

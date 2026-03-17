@@ -9,7 +9,7 @@ const currentPath = Astro.url.pathname;
 ---
 
 <!-- Top info bar -->
-<div class="bg-primary-darker text-white text-sm hidden md:block">
+<div class="bg-primary-dark text-white text-sm hidden md:block">
   <div class="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
     <div class="flex items-center gap-8">
       <!-- Service Area -->
@@ -17,7 +17,7 @@ const currentPath = Astro.url.pathname;
         <svg class="size-4 text-primary-400" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" />
         </svg>
-        {business.serviceArea[0]} & {business.address.city} Area
+        {business.address.street}, {business.address.city}, {business.address.stateAbbr} {business.address.zip}
       </span>
       <!-- Hours -->
       <span class="flex items-center gap-2 text-white">

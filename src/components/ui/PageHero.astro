@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import Text from './Text.astro';
+import defaultHeroImage from '../../assets/Resized_20240518_152754_1716064158419.JPEG';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: ImageMetadata;
+}
+
+const {
+  title,
+  description,
+  image = defaultHeroImage,
+} = Astro.props;
+---
+
+<section class="relative text-white py-20 md:py-28 px-4">
+  <Image
+    src={image}
+    alt=""
+    class="absolute inset-0 w-full h-full object-cover"
+    widths={[640, 1024, 1440, 1920]}
+    sizes="100vw"
+    quality={50}
+  />
+  <div class="absolute inset-0 bg-primary-dark/80"></div>
+  <div class="relative max-w-7xl mx-auto">
+    <Text variant="h1" color="white" className="mb-3">{title}</Text>
+    {description && (
+      <Text variant="xl" color="whiteMuted">{description}</Text>
+    )}
+  </div>
+</section>

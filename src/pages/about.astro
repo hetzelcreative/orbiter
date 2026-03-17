@@ -2,15 +2,20 @@
 import Layout from "../layouts/Layout.astro";
 import { business } from "../data/business";
 import Text from "../components/ui/Text.astro";
+import Section from "../components/ui/Section.astro";
+import PageHero from "../components/ui/PageHero.astro";
 ---
 
 <Layout
   title="About Us"
   description={`Learn more about ${business.name} and our commitment to serving ${business.address.city}.`}
 >
-  <section class="py-16 px-4">
-    <div class="max-w-3xl mx-auto">
-      <Text variant="h1" color="dark" className="mb-6">About {business.name}</Text>
+  <PageHero
+    title={`About ${business.name}`}
+    description={`Proudly serving ${business.address.city} and the surrounding communities.`}
+  />
+  <Section>
+    <div class="max-w-7xl mx-auto">
       <div class="space-y-4">
         <Text variant="paragraph">
           Welcome to {business.name}! We've been proudly serving {business.address.city} and the surrounding communities with dedication and expertise.
@@ -39,5 +44,5 @@ import Text from "../components/ui/Text.astro";
         </ul>
       </div>
     </div>
-  </section>
+  </Section>
 </Layout>

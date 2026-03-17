@@ -25,7 +25,7 @@ export const business = {
     saturday: '10:00 AM – 2:00 PM',
     sunday: 'Closed',
   },
-  serviceArea: ['Springfield', 'Chatham', 'Rochester', 'Sherman'],
+  serviceArea: ['Glenwood', 'Council Bluffs', 'Rochester', 'Sherman'],
   founded: '2024',
   description:
     'A short description of your local business for search engines. Include your primary service and location.',
