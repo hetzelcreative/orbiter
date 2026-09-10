@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+# Astro's sitemap integration emits sitemap-index.xml; redirect the
+# conventional /sitemap.xml so search engines and old links resolve.
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap-index.xml"
+  status = 301
+
+# Per-client legacy redirects (e.g. from an old WordPress site) go here:
+# [[redirects]]
+#   from = "/old-page"
+#   to = "/new-page"
+#   status = 301

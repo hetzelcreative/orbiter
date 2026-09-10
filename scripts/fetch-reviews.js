@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * Fetch Google reviews from DataForSEO and save to JSON
+ * Fetch Google reviews from DataForSEO and save to src/data/reviews.json.
+ * This is the canonical review pipeline for orbiter sites.
  *
  * Setup:
  *   1. Sign up at https://dataforseo.com
- *   2. Add DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD to .env
- *   3. Set GOOGLE_PLACE_ID below (find at https://developers.google.com/maps/documentation/places/web-service/place-id)
+ *   2. Add DATAFORSEO_LOGIN, DATAFORSEO_PASSWORD, and GOOGLE_PLACE_ID to .env
+ *      (Place ID: https://developers.google.com/maps/documentation/places/web-service/place-id)
  *
- * Usage: node scripts/fetch-reviews.js
+ * Runs automatically before every build (npm run build → prebuild), and can be
+ * run manually with `npm run fetch-reviews`. It is build-safe: if credentials or
+ * the Place ID are missing, or the fetch fails, it warns and leaves the existing
+ * committed reviews.json untouched rather than failing the build.
  */
 
 import fs from 'fs';
@@ -20,8 +24,7 @@ dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// TODO: Replace with your Google Place ID
-const PLACE_ID = '';
+const PLACE_ID = process.env.GOOGLE_PLACE_ID || '';
 const DATAFORSEO_LOGIN = process.env.DATAFORSEO_LOGIN;
 const DATAFORSEO_PASSWORD = process.env.DATAFORSEO_PASSWORD;
 
@@ -92,14 +95,12 @@ async function pollForResults(taskId, maxAttempts = 40) {
 }
 
 async function main() {
-  if (!PLACE_ID) {
-    console.error('Set GOOGLE_PLACE_ID in scripts/fetch-reviews.js');
-    process.exit(1);
-  }
-
-  if (!DATAFORSEO_LOGIN || !DATAFORSEO_PASSWORD) {
-    console.error('DataForSEO credentials not found in .env file');
-    process.exit(1);
+  if (!PLACE_ID || !DATAFORSEO_LOGIN || !DATAFORSEO_PASSWORD) {
+    console.warn(
+      '⚠ Skipping review fetch: set GOOGLE_PLACE_ID, DATAFORSEO_LOGIN, and ' +
+      'DATAFORSEO_PASSWORD in .env to enable. Keeping existing reviews.json.'
+    );
+    return;
   }
 
   console.log('Creating DataForSEO task to fetch reviews...');
@@ -158,6 +159,7 @@ async function main() {
 }
 
 main().catch(error => {
-  console.error('Error:', error.message);
-  process.exit(1);
+  // Build-safe: never fail the build over a review-fetch error. The committed
+  // reviews.json is kept as a fallback.
+  console.warn(`⚠ Review fetch failed (keeping existing reviews.json): ${error.message}`);
 });

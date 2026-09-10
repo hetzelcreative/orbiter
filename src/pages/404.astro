@@ -1,0 +1,35 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { business } from "../data/business";
+import Button from "../components/ui/Button.astro";
+import Section from "../components/ui/Section.astro";
+import Text from "../components/ui/Text.astro";
+---
+
+<Layout
+  title="Page Not Found"
+  description="Sorry, we couldn't find the page you were looking for."
+  noindex
+>
+  <Section>
+    <div class="max-w-2xl mx-auto text-center">
+      <Text variant="label" color="primary" align="center" className="mb-4">Error 404</Text>
+      <Text variant="h1" color="dark" align="center" className="mb-4">Page Not Found</Text>
+      <Text variant="xl" color="muted" align="center" className="mb-10">
+        Sorry, the page you're looking for doesn't exist or may have moved.
+      </Text>
+
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <Button href="/" variant="primary">Back to Home</Button>
+        <Button href="/contact/" variant="outline">Contact Us</Button>
+      </div>
+
+      <Text variant="base" color="muted" align="center" className="mt-10">
+        Or call us at{" "}
+        <a href={`tel:${business.phone}`} class="text-primary-600 hover:text-primary-700 font-semibold">
+          {business.phoneFormatted}
+        </a>
+      </Text>
+    </div>
+  </Section>
+</Layout>
