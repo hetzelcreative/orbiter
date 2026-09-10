@@ -23,7 +23,7 @@ import PageHero from "../components/ui/PageHero.astro";
         <Text variant="h3" color="dark" className="mb-2">Send Us a Message</Text>
         <Text variant="base" color="muted" className="mb-8">Have a question or need assistance? Fill out the form below and we'll get back to you within 24 hours.</Text>
 
-        <form class="space-y-6" name="contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+        <form class="space-y-6" name="contact" method="POST" action="/thank-you/" data-netlify="true" data-netlify-honeypot="bot-field">
           <input type="hidden" name="form-name" value="contact" />
           <p class="hidden"><label>Don't fill this out: <input name="bot-field" /></label></p>
 

@@ -1,0 +1,126 @@
+# Orbiter — Starter Template Guide
+
+Orbiter is the starter repo for local-business websites built for local-SEO clients.
+Every new client site begins as a copy of this repo and is customized per the conventions
+below. This file is the authoritative source of those conventions — when a client repo's
+own instructions disagree with this file, this file wins.
+
+**Stack:** Astro + Tailwind CSS v4 (via `@tailwindcss/vite`, no PostCSS config) +
+`@astrojs/sitemap`. React (`@astrojs/react`) is available for interactive islands but used
+sparingly (currently only the mobile menu). Deploy target is **Netlify**.
+
+---
+
+## Core principles
+
+### 1. `src/data/business.ts` is the single source of truth
+All name, address, phone (NAP), hours, geo, social profiles, and analytics IDs live in
+`business.ts` and are read from there everywhere — layout, header, footer, schema, pages.
+
+- **Never hardcode business info inline** in components, pages, or schema. If a component
+  needs the phone number or address, import `business`. (Past client sites regressed by
+  inlining NAP across Header/Footer/Layout/schema and produced a domain typo in one file —
+  don't repeat this.)
+- Extend `business.ts` with whatever scalar fields a niche needs (e.g. `broker`, `founded`,
+  `priceRange`, `lotsTotal`) rather than scattering them.
+
+### 2. Theming lives in `src/styles/global.css` `@theme` tokens
+Per-client branding = edit the `@theme` block (color scales + fonts) plus swap
+favicons/logos in `public/`. That's the intended seam.
+
+- **Drive all color from tokens** (`bg-primary-500`, `text-secondary-600`, etc.).
+  Never hardcode hex values in components or one-off gradients — a past site's brown
+  gradient didn't match its green theme because it bypassed the tokens.
+- Fonts are set via `--font-sans` / `--font-heading`. Self-host with `@fontsource*` when a
+  client needs a specific pairing.
+
+### 3. Use the UI primitives; don't hand-roll markup
+The `src/components/ui/` set is the design system: `Text`, `Button`, `Section`,
+`SectionTitle`, `PageHero`. Prefer these over raw `<h1>`/`<p>`/`<button>` + ad-hoc utility
+strings so type scale, color, and spacing stay consistent.
+
+- `Text` — every text node. Props: `variant`, `color`, `weight`, `align`, `as`.
+- `Section` — page section wrapper with `variant` (background) + `padding`.
+- `Button` — links and form buttons; `variant` (`primary`/`secondary`/`outline`/
+  `outline-white`), `size`, `href` (renders `<a>`) or `type` (renders `<button>`).
+- Only reach for raw markup when no primitive fits (e.g. inside a form field grid).
+
+### 4. Content model: data-driven, blog dormant by default
+- **Services** are the main customization surface — edit `src/data/services.ts`. Nav
+  derives the Services dropdown from this file, so adding a service updates navigation
+  automatically. `navigation.ts` is hand-edited for everything else.
+- **Blog ships wired but dormant.** The `blog` collection (`src/content.config.ts`),
+  `blog/` pages, and `BlogPostSchema` exist but are unused until there's content. To keep
+  it dormant, leave `src/content/blog/` empty and comment out the Blog nav item. Enable it
+  only when the client is actually publishing posts. It's fine to delete the blog entirely
+  for a client that will never blog.
+
+### 5. Programmatic local SEO = data file + `[slug]` page + schema
+The core SEO play for service clients: create individual location/service-area pages rather
+than stuffing every city onto one page. The reusable trio is:
+1. a typed data file (e.g. `locations.ts` with slug/city/geo/intro/faqs),
+2. a matching dynamic route (`[slug].astro`),
+3. a matching JSON-LD schema component.
+
+Keyword-bake URL slugs where it helps ranking (e.g. `/[city]-asphalt-contractor/`), and
+preserve old URLs with 301 redirects (see Deployment).
+
+### 6. Images follow slug-based conventions
+- Per-service images: `src/assets/<service-slug>/…`
+- Auto-globbed galleries: drop files in `src/assets/gallery/` and the gallery page picks
+  them up.
+- Before/after pairs: name them `before.*` / `after.*`.
+
+### 7. Schema is data-driven components
+JSON-LD lives as components in `src/components/schema/`, pulling values from `business.ts` —
+never hardcode business data into schema. Swap schema types to fit the vertical (e.g.
+`RealEstateListing` + `FAQPage` for a real-estate client). Keep FAQ/Breadcrumb/Service
+schema generic and prop-driven so they're reusable.
+
+### 8. Reviews
+Pick one approach per site and stick to it: the built-in Google-reviews fetch
+(`scripts/fetch-reviews.js` → `reviews.json`), or a hand-maintained `reviews.ts`. Don't mix.
+
+---
+
+## Deployment & forms (Netlify)
+
+Sites deploy to Netlify. `netlify.toml` configures the build, functions dir, and redirects.
+
+- **Contact / lead forms use Netlify Forms.** Pattern: `data-netlify="true"`, a honeypot
+  `bot-field`, a hidden `<input name="form-name">`, and `action="/thank-you/"` to redirect
+  on submit. The `/thank-you` page is `noindex`.
+- **SMS notifications** go through `netlify/functions/send-sms.js` (Twilio). Wire it under
+  Netlify → Forms → Form notifications → Outgoing webhook, pointing at
+  `/.netlify/functions/send-sms`. Set the four env vars from `.env.example` in the Netlify
+  dashboard. The function has a `contact` branch and a generic fallback, so new forms notify
+  automatically — add a branch to format a specific form nicely.
+  **The form field `name`s are the contract** between the form and the function.
+- **Legacy redirects** (migrating off WordPress, etc.) go in `netlify.toml` as 301s.
+
+## Analytics
+GA4 is loaded off the main thread via Partytown, gated on `business.gaMeasurementId`. The
+tags are pre-wired (commented) in `Layout.astro` — uncomment once the client's GA ID is set.
+Keep analytics off the main thread; don't add inline main-thread gtag snippets.
+
+---
+
+## Per-client launch checklist
+These fields are placeholders in the starter and **must** be changed before launch (past
+sites shipped with several of these left as defaults):
+
+- [ ] `package.json` `name` — still `"orbiter"` in fresh copies
+- [ ] `src/data/business.ts` — all NAP, hours, geo, socials, `siteUrl`, `gaMeasurementId`
+- [ ] `astro.config.mjs` `site` — the production domain (drives sitemap + canonical URLs)
+- [ ] `public/robots.txt` — sitemap URL (do not leave `yourbusiness.com`)
+- [ ] `src/styles/global.css` `@theme` — brand colors + fonts
+- [ ] `public/` — favicons, logos, `og-meta.png`, `site.webmanifest`
+- [ ] `src/data/services.ts` + `navigation.ts` — real services & nav
+- [ ] Netlify env vars for Twilio (if SMS notifications are used)
+- [ ] Confirm one review source is wired (fetch script **or** static `reviews.ts`)
+- [ ] Uncomment the GA/Partytown tags in `Layout.astro` once `gaMeasurementId` is set
+
+## Commands
+- `npm run dev` — local dev server
+- `npm run build` — production build to `./dist/`
+- `npm run preview` — preview the build locally
