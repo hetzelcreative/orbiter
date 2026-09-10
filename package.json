@@ -7,6 +7,8 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/fetch-reviews.js",
+    "fetch-reviews": "node scripts/fetch-reviews.js",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

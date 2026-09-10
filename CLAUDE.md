@@ -77,9 +77,16 @@ never hardcode business data into schema. Swap schema types to fit the vertical 
 `RealEstateListing` + `FAQPage` for a real-estate client). Keep FAQ/Breadcrumb/Service
 schema generic and prop-driven so they're reusable.
 
-### 8. Reviews
-Pick one approach per site and stick to it: the built-in Google-reviews fetch
-(`scripts/fetch-reviews.js` → `reviews.json`), or a hand-maintained `reviews.ts`. Don't mix.
+### 8. Reviews — fetched on build via DataForSEO
+Google reviews are the standard, single approach: `scripts/fetch-reviews.js` pulls them from
+DataForSEO into `src/data/reviews.json`, consumed via `src/utils/googleReviews.ts` and
+`ReviewSchema.astro`. Don't hand-maintain a `reviews.ts` — use this pipeline.
+
+- Runs automatically before every build (`prebuild`), and manually via `npm run fetch-reviews`.
+- Requires `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD`, and `GOOGLE_PLACE_ID` in `.env`
+  (and in the Netlify dashboard for production builds).
+- **Build-safe:** if those are unset or the fetch fails, it warns and keeps the committed
+  `reviews.json` rather than failing the build — so the fetch only runs where creds exist.
 
 ---
 
@@ -117,7 +124,7 @@ sites shipped with several of these left as defaults):
 - [ ] `public/` — favicons, logos, `og-meta.png`, `site.webmanifest`
 - [ ] `src/data/services.ts` + `navigation.ts` — real services & nav
 - [ ] Netlify env vars for Twilio (if SMS notifications are used)
-- [ ] Confirm one review source is wired (fetch script **or** static `reviews.ts`)
+- [ ] Set DataForSEO creds + `GOOGLE_PLACE_ID` (Netlify env) so reviews fetch on build
 - [ ] Uncomment the GA/Partytown tags in `Layout.astro` once `gaMeasurementId` is set
 
 ## Commands
