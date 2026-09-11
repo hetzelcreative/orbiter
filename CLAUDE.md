@@ -11,6 +11,41 @@ sparingly (currently only the mobile menu). Deploy target is **Netlify**.
 
 ---
 
+## Building a new client site (start here)
+
+When the user asks to build, start, or spin up a site for a new client — e.g. "let's build
+a new site for XYZ" — this is a fresh clone of orbiter and that phrasing is the kickoff.
+Follow the conventions in this file (the "Site architecture & internal linking" rules are
+**doctrine**) and use `docs/design-references.md` for design direction. If the user names
+specific inspiration/competitor sites, treat those as additional references.
+
+If essential info is missing (NAP, primary GBP category, or the category/service list), ask
+a few targeted questions before starting — don't invent business facts.
+
+Work in **four phases and stop for approval between each** — don't run ahead:
+
+1. **Intake & IA** — populate `business.ts` (single source of truth); draft `categories.ts`
+   (one hub per GBP category) and `services.ts` (each service's `category` → its parent);
+   set brand tokens + fonts in `global.css` `@theme`; update `astro.config.mjs` `site`,
+   `package.json` `name`, `robots.txt`. Output the IA tree + palette/fonts, then stop.
+2. **Research** — top competitors in the client's city for the primary category; real Google
+   "People Also Ask" questions per category/service (don't invent generic FAQs); seasonal/
+   market angles. Summarize findings + proposed FAQs, then stop.
+3. **Home page only** — design the homepage on the **primary GBP category + primary
+   location**, linking only to category hubs, drawing visual direction from the design
+   references (professional muted base + single warm accent for CTAs, real photography, dual
+   hero CTA incl. click-to-call, trust signals high, reviews lower). Build only the home page
+   + shared shell, then **stop for design review**.
+4. **Full site** (after approval) — all category hubs (intro + own services + PAA FAQ via
+   `FAQSection`) and service pages (description + `Breadcrumb` + in-body link to parent +
+   FAQ); wire schema + footer `GbpMap` + contact→`/thank-you/` + Netlify/Twilio; enforce the
+   siloing rules; `npm run build`; then walk the launch checklist and flag placeholders.
+
+Keep everything driven by data files, tokens, and UI primitives — don't hand-roll markup or
+hardcode business data.
+
+---
+
 ## Core principles
 
 ### 1. `src/data/business.ts` is the single source of truth
