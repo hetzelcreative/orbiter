@@ -1,0 +1,42 @@
+---
+import { business } from '../../data/business';
+
+interface Props {
+  name: string;
+  description: string;
+  /** Path relative to site root, e.g. "/roofing/shingle-repair/" */
+  path: string;
+  /** Parent category name, e.g. "Roofing" */
+  category?: string;
+}
+
+const { name, description, path, category } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name,
+  description,
+  ...(category ? { serviceType: category } : {}),
+  url: new URL(path, business.siteUrl).toString(),
+  areaServed: business.serviceArea?.map((area) => ({
+    '@type': 'City',
+    name: area,
+  })),
+  provider: {
+    '@type': 'LocalBusiness',
+    name: business.name,
+    telephone: business.phone,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: business.address.street,
+      addressLocality: business.address.city,
+      addressRegion: business.address.stateAbbr,
+      postalCode: business.address.zip,
+      addressCountry: business.address.country,
+    },
+  },
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

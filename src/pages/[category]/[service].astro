@@ -2,61 +2,67 @@
 import Layout from "../../layouts/Layout.astro";
 import { business } from "../../data/business";
 import { services, getServiceBySlug } from "../../data/services";
+import { getCategoryBySlug } from "../../data/categories";
 import { Image } from "astro:assets";
 import Text from "../../components/ui/Text.astro";
 import Button from "../../components/ui/Button.astro";
 import Section from "../../components/ui/Section.astro";
 import SectionTitle from "../../components/ui/SectionTitle.astro";
 import PageHero from "../../components/ui/PageHero.astro";
+import FAQSection from "../../components/ui/FAQSection.astro";
+import Breadcrumb from "../../components/layout/Breadcrumb.astro";
+import ServiceSchema from "../../components/schema/ServiceSchema.astro";
 import imgCta from "../../assets/Resized_20240725_103324_1721921613656.JPEG";
 
 export function getStaticPaths() {
   return services.map((service) => ({
-    params: { slug: service.slug },
+    params: { category: service.category, service: service.slug },
   }));
 }
 
-const { slug } = Astro.params;
-const service = getServiceBySlug(slug!)!;
+const { service: serviceSlug } = Astro.params;
+const service = getServiceBySlug(serviceSlug!)!;
+const category = getCategoryBySlug(service.category)!;
+const categoryPath = `/${category.slug}/`;
+const path = `/${category.slug}/${service.slug}/`;
 ---
 
 <Layout
   title={`${service.name} | ${business.address.city}, ${business.address.stateAbbr}`}
   description={service.excerpt}
 >
-  <PageHero
-    title={service.name}
+  <ServiceSchema
+    slot="head"
+    name={service.name}
     description={service.excerpt}
+    path={path}
+    category={category.name}
+  />
+
+  <PageHero title={service.name} description={service.excerpt} />
+
+  <Breadcrumb
+    crumbs={[
+      { name: "Home", href: "/" },
+      { name: category.name, href: categoryPath },
+      { name: service.name, href: path },
+    ]}
   />
 
   <!-- Description -->
-  <Section>
-    <div class="max-w-7xl mx-auto">
+  <Section padding="compact">
+    <div class="max-w-3xl mx-auto">
       <Text variant="paragraph">{service.description}</Text>
+      <Text variant="base" color="muted" className="mt-6">
+        Part of our{" "}
+        <a href={categoryPath} class="text-primary-600 hover:text-primary-700 font-semibold">{category.name}</a>
+        {" "}services.
+      </Text>
     </div>
   </Section>
 
-  <!-- FAQs -->
-  {service.faqs.length > 0 && (
-    <Section variant="light">
-      <div class="max-w-7xl mx-auto">
-        <SectionTitle title="Frequently Asked Questions" align="left" className="mb-8" />
-        <div class="space-y-4">
-          {service.faqs.map((faq) => (
-            <details class="group border border-gray-200 rounded-xl bg-white">
-              <summary class="flex items-center justify-between cursor-pointer p-5 font-heading font-semibold text-gray-900 hover:text-primary-600 transition-colors">
-                {faq.question}
-                <svg class="size-5 shrink-0 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-              </summary>
-              <div class="px-5 pb-5">
-                <Text variant="base" color="muted">{faq.answer}</Text>
-              </div>
-            </details>
-          ))}
-        </div>
-      </div>
-    </Section>
-  )}
+  <!-- FAQ (required on service pages) -->
+  <FAQSection faqs={service.faqs} />
 
   <!-- CTA -->
   <section class="relative py-24 md:py-32 px-4">
