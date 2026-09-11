@@ -1,0 +1,36 @@
+---
+import { business } from '../../data/business';
+
+/**
+ * Google Business Profile map embed. Rendered in the site footer (see
+ * CLAUDE.md — required site-wide to reinforce NAP + location signals).
+ *
+ * Set `business.googleMapsEmbed` to the iframe `src` from Google Maps →
+ * Share → Embed a map. Until that's set, it falls back to a geo-based
+ * embed so a map still renders on fresh clones and the demo.
+ */
+interface Props {
+  height?: number;
+  className?: string;
+}
+
+const { height = 224, className = 'rounded-lg' } = Astro.props;
+
+const mapSrc =
+  business.googleMapsEmbed ||
+  `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d${business.geo.lng}!3d${business.geo.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s!2s${encodeURIComponent(
+    business.address.street + ', ' + business.address.city + ', ' + business.address.stateAbbr + ' ' + business.address.zip
+  )}!5e0!3m2!1sen!2sus`;
+---
+
+<iframe
+  src={mapSrc}
+  width="100%"
+  height={height}
+  class={className}
+  style="border:0;"
+  loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade"
+  allowfullscreen
+  title={`Map to ${business.name}`}
+></iframe>

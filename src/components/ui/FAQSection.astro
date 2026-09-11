@@ -1,0 +1,42 @@
+---
+import type { FAQ } from '../../data/services';
+import Section from './Section.astro';
+import SectionTitle from './SectionTitle.astro';
+import Text from './Text.astro';
+import FAQSchema from '../schema/FAQSchema.astro';
+
+/**
+ * FAQ accordion + FAQPage JSON-LD. Required on every category hub and service
+ * page (see CLAUDE.md). Source questions from Google "People Also Ask".
+ */
+interface Props {
+  faqs: FAQ[];
+  title?: string;
+  variant?: 'default' | 'light';
+}
+
+const { faqs, title = 'Frequently Asked Questions', variant = 'light' } = Astro.props;
+---
+
+{faqs.length > 0 && (
+  <Section variant={variant}>
+    <div class="max-w-3xl mx-auto">
+      <SectionTitle title={title} align="left" className="mb-8" />
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group border border-gray-200 rounded-xl bg-white">
+            <summary class="flex items-center justify-between cursor-pointer p-5 font-heading font-semibold text-gray-900 hover:text-primary-600 transition-colors">
+              {faq.question}
+              <svg class="size-5 shrink-0 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+            </summary>
+            <div class="px-5 pb-5">
+              <Text variant="base" color="muted">{faq.answer}</Text>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  <FAQSchema faqs={faqs} />
+)}

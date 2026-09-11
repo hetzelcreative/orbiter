@@ -1,37 +1,42 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { business } from "../../data/business";
-import { services } from "../../data/services";
+import { categories } from "../../data/categories";
+import { getServicesByCategory } from "../../data/services";
 import Text from "../../components/ui/Text.astro";
 import Button from "../../components/ui/Button.astro";
 import Section from "../../components/ui/Section.astro";
+import SectionTitle from "../../components/ui/SectionTitle.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 ---
 
 <Layout
   title="Services"
-  description={`Professional lawn care services offered by ${business.name} in ${business.address.city}, ${business.address.stateAbbr}.`}
+  description={`Professional services offered by ${business.name} in ${business.address.city}, ${business.address.stateAbbr}.`}
 >
   <PageHero
     title="Our Services"
-    description="We offer a full range of professional lawn care services to keep your property looking its best."
+    description="Explore our services by category."
   />
   <Section>
-    <div class="max-w-7xl mx-auto">
-      <div class="space-y-8">
-        {services.map((service) => (
-          <a href={`/services/${service.slug}/`} class="block p-6 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <Text variant="h4" color="dark" className="mb-2">{service.name}</Text>
-            <Text color="muted">{service.excerpt}</Text>
-          </a>
-        ))}
-      </div>
-
-      <div class="mt-12 bg-primary-50 rounded-xl p-8 text-center">
-        <Text variant="h4" color="dark" className="mb-2">Need a Custom Solution?</Text>
-        <Text color="muted" className="mb-4">Contact us to discuss your specific needs.</Text>
-        <Button href="/contact/">Free Quote</Button>
-      </div>
+    <div class="max-w-7xl mx-auto space-y-12">
+      {categories.map((category) => (
+        <div>
+          <div class="flex items-end justify-between gap-4 mb-6 flex-wrap">
+            <SectionTitle title={category.name} align="left" className="!mb-0" />
+            <Button href={`/${category.slug}/`} variant="outline" size="small">View {category.name}</Button>
+          </div>
+          <Text color="muted" className="mb-6 max-w-2xl">{category.excerpt}</Text>
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {getServicesByCategory(category.slug).map((service) => (
+              <a href={`/${category.slug}/${service.slug}/`} class="group block p-6 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <Text variant="h4" color="dark" className="mb-2 group-hover:text-primary-600 transition-colors">{service.name}</Text>
+                <Text variant="sm" color="muted">{service.excerpt}</Text>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   </Section>
 </Layout>

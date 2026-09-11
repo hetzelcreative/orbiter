@@ -1,0 +1,99 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { business } from "../../data/business";
+import { categories, getCategoryBySlug } from "../../data/categories";
+import { getServicesByCategory } from "../../data/services";
+import { Image } from "astro:assets";
+import Text from "../../components/ui/Text.astro";
+import Button from "../../components/ui/Button.astro";
+import Section from "../../components/ui/Section.astro";
+import SectionTitle from "../../components/ui/SectionTitle.astro";
+import PageHero from "../../components/ui/PageHero.astro";
+import FAQSection from "../../components/ui/FAQSection.astro";
+import Breadcrumb from "../../components/layout/Breadcrumb.astro";
+import ServiceSchema from "../../components/schema/ServiceSchema.astro";
+import imgCta from "../../assets/Resized_20240725_103324_1721921613656.JPEG";
+
+export function getStaticPaths() {
+  return categories.map((category) => ({
+    params: { category: category.slug },
+  }));
+}
+
+const { category: categorySlug } = Astro.params;
+const category = getCategoryBySlug(categorySlug!)!;
+const categoryServices = getServicesByCategory(category.slug);
+const path = `/${category.slug}/`;
+---
+
+<Layout
+  title={`${category.name} in ${business.address.city}, ${business.address.stateAbbr}`}
+  description={category.excerpt}
+>
+  <ServiceSchema
+    slot="head"
+    name={category.name}
+    description={category.excerpt}
+    path={path}
+    category={category.gbpCategory}
+  />
+
+  <PageHero title={category.name} description={category.excerpt} />
+
+  <Breadcrumb crumbs={[{ name: "Home", href: "/" }, { name: category.name, href: path }]} />
+
+  <!-- Intro -->
+  <Section padding="compact">
+    <div class="max-w-3xl mx-auto">
+      <Text variant="paragraph">{category.intro}</Text>
+    </div>
+  </Section>
+
+  <!-- Services in this category (links only to its own services) -->
+  <Section variant="light">
+    <div class="max-w-7xl mx-auto">
+      <SectionTitle title={`Our ${category.name} Services`} className="mb-12" />
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {categoryServices.map((service) => (
+          <a href={`/${category.slug}/${service.slug}/`} class="group flex flex-col p-6 border border-gray-100 bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow">
+            <Text variant="h4" color="dark" className="mb-2 group-hover:text-primary-600 transition-colors">{service.name}</Text>
+            <Text variant="sm" color="muted" className="mb-4">{service.excerpt}</Text>
+            <span class="mt-auto inline-flex items-center gap-1.5 text-sm font-heading font-semibold text-primary-600">
+              Learn more
+              <svg class="size-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  <!-- FAQ (required on hubs) -->
+  <FAQSection faqs={category.faqs} />
+
+  <!-- CTA -->
+  <section class="relative py-24 md:py-32 px-4">
+    <Image
+      src={imgCta}
+      alt=""
+      class="absolute inset-0 w-full h-full object-cover"
+      widths={[640, 1024, 1440, 1920]}
+      sizes="100vw"
+      quality={50}
+    />
+    <div class="absolute inset-0 bg-primary-dark/85"></div>
+    <div class="relative max-w-3xl mx-auto text-center">
+      <SectionTitle
+        title="Ready to Get Started?"
+        description={`Contact us today for a free quote on ${category.name.toLowerCase()}. We respond within the business day.`}
+        color="white"
+        lineColor="white"
+        className="mb-8"
+      />
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button href={`tel:${business.phone}`} variant="outline-white">{business.phoneFormatted}</Button>
+        <Button href="/contact/" variant="secondary">Free Quote</Button>
+      </div>
+    </div>
+  </section>
+</Layout>

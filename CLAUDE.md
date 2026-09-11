@@ -45,10 +45,18 @@ strings so type scale, color, and spacing stay consistent.
   `outline-white`), `size`, `href` (renders `<a>`) or `type` (renders `<button>`).
 - Only reach for raw markup when no primitive fits (e.g. inside a form field grid).
 
-### 4. Content model: data-driven, blog dormant by default
-- **Services** are the main customization surface — edit `src/data/services.ts`. Nav
-  derives the Services dropdown from this file, so adding a service updates navigation
-  automatically. `navigation.ts` is hand-edited for everything else.
+### 4. Content model: two-tier categories → services, blog dormant by default
+- **The content spine is a two-tier hierarchy that mirrors the client's Google Business
+  Profile (GBP) categories.** Top tier = **categories** (one hub page per GBP category),
+  bottom tier = **services** (sub-service pages nested under a category). Edit
+  `src/data/categories.ts` (the hubs) and `src/data/services.ts` (each service carries a
+  `category` slug linking it to its parent). This is the main customization surface, and it
+  drives routing, navigation, and the internal-linking model below.
+- Nav derives the Services dropdown from these files, so adding a category/service updates
+  navigation automatically. `navigation.ts` is hand-edited for everything else.
+- **Collapses gracefully for single-category clients:** a business with one GBP category has
+  one hub; the services still nest under it. Don't force multiple categories where the
+  business only has one.
 - **Blog ships wired but dormant.** The `blog` collection (`src/content.config.ts`),
   `blog/` pages, and `BlogPostSchema` exist but are unused until there's content. To keep
   it dormant, leave `src/content/blog/` empty and comment out the Blog nav item. Enable it
@@ -87,6 +95,42 @@ DataForSEO into `src/data/reviews.json`, consumed via `src/utils/googleReviews.t
   (and in the Netlify dashboard for production builds).
 - **Build-safe:** if those are unset or the fetch fails, it warns and keeps the committed
   `reviews.json` rather than failing the build — so the fetch only runs where creds exist.
+
+---
+
+## Site architecture & internal linking (the SEO model)
+
+Every orbiter site follows the same siloed information architecture. These rules are
+**doctrine** — follow them on every build. They exist to concentrate topical authority per
+GBP category and avoid diluting it with cross-links.
+
+**Page types & routes**
+- **Home** (`/`) — focused on the client's **primary GBP category + primary location**
+  (e.g. "Roofing in Omaha, NE"). It is the top of the funnel, not a catch-all.
+- **Category hub** (`/[category]/`) — one page per GBP category (e.g. `/roofing/`). Introduces
+  the category and links to all of its service pages.
+- **Service** (`/[category]/[service]/`) — one page per sub-service, nested under its parent
+  category (e.g. `/roofing/shingle-repair/`). Keyword-bake slugs where it helps ranking.
+
+**Linking rules (silos)**
+1. **Home links only to category hubs** — never directly to individual service pages.
+2. **Each category hub links to all of its own service pages** (and only its own).
+3. **Each service page links back to its parent category** (breadcrumb + in-body link).
+4. **Do NOT cross-link between categories** — a roofing service page must not link to a
+   gutters service or the gutters hub. Keep each category's link graph self-contained.
+   (Global nav/footer links are exempt; this rule governs in-content links.)
+
+**Required on-page elements**
+5. **Category hubs and service pages each get an FAQ section** rendered with `FAQSection`
+   (which emits `FAQPage` JSON-LD via `FAQSchema`). Source questions from Google's
+   "People Also Ask" for that category/service during research — don't invent generic FAQs.
+6. **Service pages show a breadcrumb** (`Home › Category › Service`) via `Breadcrumb`
+   (emits `BreadcrumbList` JSON-LD).
+7. **The GBP map is embedded in the site footer** on every page via `GbpMap`, reading
+   `business.googleMapsEmbed`. This reinforces NAP + location signals site-wide.
+
+The enabling components (`FAQSection`, `Breadcrumb`, `GbpMap`) and the category/service data
+model + routes ship in the starter so these rules are structural, not something to remember.
 
 ---
 

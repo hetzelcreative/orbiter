@@ -6,25 +6,18 @@ import Text from "../components/ui/Text.astro";
 import Button from "../components/ui/Button.astro";
 import Section from "../components/ui/Section.astro";
 import SectionTitle from "../components/ui/SectionTitle.astro";
-import { services } from "../data/services";
+import { categories } from "../data/categories";
 import heroImage from "../assets/Resized_20240614_125612_1718388163452.JPEG";
 import imgAbout from "../assets/Resized_20240614_141408_1718392493946.JPEG";
 import imgFamily from "../assets/family.jpeg";
 import imgCta from "../assets/Resized_20240725_103324_1721921613656.JPEG";
-import imgMowing from "../assets/Resized_20240503_154235_1714768964347.JPEG";
-import imgTreatment from "../assets/Resized_20240510_112755_1715358515041.JPEG";
-import imgAeration from "../assets/Resized_20240612_122829_1718213368933.JPEG";
-import imgOverseeding from "../assets/Resized_20240517_130948_1715969405371.JPEG";
-import imgSpring from "../assets/Resized_20240409_142926_1712691166529.JPEG";
-import imgFall from "../assets/Resized_20240614_102132_1718388169770.JPEG";
+import imgMaintenance from "../assets/Resized_20240503_154235_1714768964347.JPEG";
+import imgCleanup from "../assets/Resized_20240409_142926_1712691166529.JPEG";
 
-const serviceImages: Record<string, ImageMetadata> = {
-  'lawn-mowing': imgMowing,
-  'lawn-treatment-programs': imgTreatment,
-  'aeration': imgAeration,
-  'overseeding': imgOverseeding,
-  'spring-cleanup': imgSpring,
-  'fall-cleanup': imgFall,
+// Home links only to category hubs (see CLAUDE.md internal-linking model).
+const categoryImages: Record<string, ImageMetadata> = {
+  'lawn-maintenance': imgMaintenance,
+  'yard-cleanup': imgCleanup,
 };
 ---
 
@@ -84,22 +77,22 @@ const serviceImages: Record<string, ImageMetadata> = {
         description="From weekly mowing to full-season treatment programs, we handle the work so you don't have to."
         className="mb-12"
       />
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {services.map((service) => (
-          <a href={`/services/${service.slug}/`} class="group rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow">
-            <div class="relative h-48 overflow-hidden">
+      <div class="grid md:grid-cols-2 gap-8">
+        {categories.map((category) => (
+          <a href={`/${category.slug}/`} class="group rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow">
+            <div class="relative h-56 overflow-hidden">
               <Image
-                src={serviceImages[service.slug]}
-                alt={service.name}
+                src={categoryImages[category.slug]}
+                alt={category.name}
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                widths={[400, 600]}
-                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                widths={[400, 600, 800]}
+                sizes="(min-width: 768px) 50vw, 100vw"
                 quality={70}
               />
             </div>
-            <div class="p-5">
-              <Text variant="h4" color="dark" className="mb-2">{service.name}</Text>
-              <Text variant="sm" color="muted">{service.excerpt}</Text>
+            <div class="p-6">
+              <Text variant="h4" color="dark" className="mb-2 group-hover:text-primary-600 transition-colors">{category.name}</Text>
+              <Text variant="sm" color="muted">{category.excerpt}</Text>
             </div>
           </a>
         ))}
