@@ -1,6 +1,16 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/*
+ * Tailwind v4 gates hover variants behind `@media (hover: hover)`, so on
+ * touch-primary devices (touchscreen laptops / 2-in-1s) hover effects —
+ * including the nav dropdowns — silently never fire. Redefine the hover
+ * variants without that gate so hover works on every pointer type
+ * (mouse, trackpad, and tap-to-open on touch).
+ */
+@custom-variant hover (&:hover);
+@custom-variant group-hover (&:is(:where(.group):hover *));
+
 @theme {
   --font-sans: 'Inter', sans-serif;
   --font-heading: 'Poppins', sans-serif;
