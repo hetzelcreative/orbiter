@@ -176,7 +176,7 @@ Sites deploy to Netlify. `netlify.toml` configures the build, functions dir, and
 - **Contact / lead forms use Netlify Forms.** Pattern: `data-netlify="true"`, a honeypot
   `bot-field`, a hidden `<input name="form-name">`, and `action="/thank-you/"` to redirect
   on submit. The `/thank-you` page is `noindex`.
-- **SMS notifications** go through `netlify/functions/send-sms.js` (Twilio). Wire it under
+- **SMS notifications** go through `netlify/functions/send-sms.cjs` (Twilio). Wire it under
   Netlify → Forms → Form notifications → Outgoing webhook, pointing at
   `/.netlify/functions/send-sms`. Set the four env vars from `.env.example` in the Netlify
   dashboard. The function has a `contact` branch and a generic fallback, so new forms notify
