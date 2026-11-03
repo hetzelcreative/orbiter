@@ -12,7 +12,7 @@
  *   Email (Resend)
  *     RESEND_API_KEY        sending-only key, one per client site
  *     NOTIFY_EMAIL_TO       recipient(s), comma-separated
- *     NOTIFY_EMAIL_FROM     optional; default below (verified in Resend)
+ *     NOTIFY_EMAIL_FROM     optional; defaults to "<site name> Website <notifications@forms.hetzelcreative.com>"
  *     NOTIFY_SITE_NAME      optional; label in subject line, defaults to the site hostname
  *
  *   SMS (Twilio)
@@ -31,7 +31,7 @@
  * automatically. The form field `name`s are the contract.
  */
 
-const DEFAULT_FROM = 'Website Forms <forms@forms.hetzelcreative.com>';
+const DEFAULT_FROM_ADDRESS = "notifications@forms.hetzelcreative.com";
 
 // Netlify adds these to `data`; they're noise in a notification.
 const SKIP_FIELDS = new Set([
@@ -134,7 +134,7 @@ async function sendEmail({ siteName, formName, formLabel, fields, summary, submi
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  const from = process.env.NOTIFY_EMAIL_FROM || DEFAULT_FROM;
+  const from = process.env.NOTIFY_EMAIL_FROM || `${siteName} Website <${DEFAULT_FROM_ADDRESS}>`;
 
   const submitter = fields.find((f) => f.name === 'email' && EMAIL_RE.test(f.value));
   const nameParts = ['first-name', 'last-name', 'name']
