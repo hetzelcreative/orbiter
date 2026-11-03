@@ -38,7 +38,7 @@ Work in **four phases and stop for approval between each** — don't run ahead:
    + shared shell, then **stop for design review**.
 4. **Full site** (after approval) — all category hubs (intro + own services + PAA FAQ via
    `FAQSection`) and service pages (description + `Breadcrumb` + in-body link to parent +
-   FAQ); wire schema + footer `GbpMap` + contact→`/thank-you/` + Netlify/Twilio; enforce the
+   FAQ); wire schema + footer `GbpMap` + contact→`/thank-you/` + Netlify notify webhook; enforce the
    siloing rules; `npm run build`; then walk the launch checklist and flag placeholders.
 
 Keep everything driven by data files, tokens, and UI primitives — don't hand-roll markup or
@@ -176,12 +176,21 @@ Sites deploy to Netlify. `netlify.toml` configures the build, functions dir, and
 - **Contact / lead forms use Netlify Forms.** Pattern: `data-netlify="true"`, a honeypot
   `bot-field`, a hidden `<input name="form-name">`, and `action="/thank-you/"` to redirect
   on submit. The `/thank-you` page is `noindex`.
-- **SMS notifications** go through `netlify/functions/send-sms.cjs` (Twilio). Wire it under
-  Netlify → Forms → Form notifications → Outgoing webhook, pointing at
-  `/.netlify/functions/send-sms`. Set the four env vars from `.env.example` in the Netlify
-  dashboard. The function has a `contact` branch and a generic fallback, so new forms notify
-  automatically — add a branch to format a specific form nicely.
+- **Form notifications (email + SMS)** go through `netlify/functions/notify.cjs`. Wire it
+  under Netlify → Forms → Form notifications → Outgoing webhook, pointing at
+  `/.netlify/functions/notify`. Each channel turns on when its env vars exist in the Netlify
+  dashboard (see `.env.example`):
+  - **Email via Resend** — `RESEND_API_KEY` (a sending-only key, one per site) +
+    `NOTIFY_EMAIL_TO` (comma-separated). Sends from the agency's verified subdomain
+    `forms.hetzelcreative.com`, with reply-to set to the submitter. **Do not use Netlify's
+    built-in email notification** — Netlify only allows recipients who are members of the
+    Netlify team, so client addresses are rejected.
+  - **SMS via Twilio** — the four `TWILIO_*` / `RECIPIENT_PHONE_NUMBER` vars.
+  The function has a `contact` branch and a generic fallback, so new forms notify
+  automatically — add a branch in `buildSummary()` to format a specific form nicely.
+  File uploads arrive as links to the Netlify-hosted attachment (login required).
   **The form field `name`s are the contract** between the form and the function.
+  (`send-sms.cjs` remains as an alias so older webhook URLs keep working.)
 - **Legacy redirects** (migrating off WordPress, etc.) go in `netlify.toml` as 301s.
 
 ## Analytics
@@ -202,7 +211,8 @@ sites shipped with several of these left as defaults):
 - [ ] `src/styles/global.css` `@theme` — brand colors + fonts
 - [ ] `public/` — favicons, logos, `og-meta.png`, `site.webmanifest`
 - [ ] `src/data/services.ts` + `navigation.ts` — real services & nav
-- [ ] Netlify env vars for Twilio (if SMS notifications are used)
+- [ ] Netlify env vars: `RESEND_API_KEY` + `NOTIFY_EMAIL_TO` for email notifications
+      (and the Twilio vars if SMS is wanted); add the outgoing webhook to `/.netlify/functions/notify`
 - [ ] Set DataForSEO creds + `GOOGLE_PLACE_ID` (Netlify env) so reviews fetch on build
 - [ ] Uncomment the GA/Partytown tags in `Layout.astro` once `gaMeasurementId` is set
 
