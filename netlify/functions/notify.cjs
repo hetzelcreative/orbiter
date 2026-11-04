@@ -12,7 +12,7 @@
  *   Email (Resend)
  *     RESEND_API_KEY        sending-only key, one per client site
  *     NOTIFY_EMAIL_TO       recipient(s), comma-separated
- *     NOTIFY_EMAIL_FROM     optional; defaults to "<site name> Website <notifications@forms.hetzelcreative.com>"
+ *     NOTIFY_EMAIL_FROM     optional; defaults to "<NOTIFY_SITE_NAME> <notifications@forms.hetzelcreative.com>"
  *     NOTIFY_SITE_NAME      optional; label in subject line, defaults to the site hostname
  *
  *   SMS (Twilio)
@@ -134,9 +134,9 @@ async function sendEmail({ siteName, formName, formLabel, fields, summary, submi
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  // Quote the display name: unquoted names can't contain dots, so a hostname
-  // fallback like "example.netlify.app Website <...>" would be rejected (422).
-  const displayName = `${siteName} Website`.replace(/["\\]/g, '');
+  // Display name is NOTIFY_SITE_NAME verbatim (or the hostname fallback). Quoted,
+  // because unquoted names can't contain dots and Resend rejects them (422).
+  const displayName = siteName.replace(/["\\]/g, '');
   const from = process.env.NOTIFY_EMAIL_FROM || `"${displayName}" <${DEFAULT_FROM_ADDRESS}>`;
 
   const submitter = fields.find((f) => f.name === 'email' && EMAIL_RE.test(f.value));
