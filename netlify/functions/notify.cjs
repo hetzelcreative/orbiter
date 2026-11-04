@@ -12,7 +12,8 @@
  *   Email (Resend)
  *     RESEND_API_KEY        sending-only key, one per client site
  *     NOTIFY_EMAIL_TO       recipient(s), comma-separated
- *     NOTIFY_EMAIL_FROM     optional; defaults to "<NOTIFY_SITE_NAME> <notifications@forms.hetzelcreative.com>"
+ *     NOTIFY_EMAIL_FROM     optional; a display name ("Leick Construction Website") or full
+ *                           "Name <addr>"; defaults to NOTIFY_SITE_NAME at notifications@forms.hetzelcreative.com
  *     NOTIFY_SITE_NAME      optional; label in subject line, defaults to the site hostname
  *
  *   SMS (Twilio)
@@ -134,10 +135,14 @@ async function sendEmail({ siteName, formName, formLabel, fields, summary, submi
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  // Display name is NOTIFY_SITE_NAME verbatim (or the hostname fallback). Quoted,
-  // because unquoted names can't contain dots and Resend rejects them (422).
-  const displayName = siteName.replace(/["\\]/g, '');
-  const from = process.env.NOTIFY_EMAIL_FROM || `"${displayName}" <${DEFAULT_FROM_ADDRESS}>`;
+  // Sender: NOTIFY_EMAIL_FROM may be a full "Name <addr>" / bare address, or just
+  // a display name (no "@"), in which case the default address is appended.
+  // Falls back to NOTIFY_SITE_NAME / hostname as the name. Always quoted, because
+  // unquoted names can't contain dots and Resend rejects them (422).
+  const fromEnv = (process.env.NOTIFY_EMAIL_FROM || '').trim();
+  const from = fromEnv.includes('@')
+    ? fromEnv
+    : `"${(fromEnv || siteName).replace(/["\\]/g, '')}" <${DEFAULT_FROM_ADDRESS}>`;
 
   const submitter = fields.find((f) => f.name === 'email' && EMAIL_RE.test(f.value));
   const nameParts = ['first-name', 'last-name', 'name']
