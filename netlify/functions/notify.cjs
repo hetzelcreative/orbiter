@@ -134,7 +134,10 @@ async function sendEmail({ siteName, formName, formLabel, fields, summary, submi
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  const from = process.env.NOTIFY_EMAIL_FROM || `${siteName} Website <${DEFAULT_FROM_ADDRESS}>`;
+  // Quote the display name: unquoted names can't contain dots, so a hostname
+  // fallback like "example.netlify.app Website <...>" would be rejected (422).
+  const displayName = `${siteName} Website`.replace(/["\\]/g, '');
+  const from = process.env.NOTIFY_EMAIL_FROM || `"${displayName}" <${DEFAULT_FROM_ADDRESS}>`;
 
   const submitter = fields.find((f) => f.name === 'email' && EMAIL_RE.test(f.value));
   const nameParts = ['first-name', 'last-name', 'name']
