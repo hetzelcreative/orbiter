@@ -212,7 +212,10 @@ sites shipped with several of these left as defaults):
 - [ ] `public/` — favicons, logos, `og-meta.png`, `site.webmanifest`
 - [ ] `src/data/services.ts` + `navigation.ts` — real services & nav
 - [ ] Netlify env vars: `RESEND_API_KEY` + `NOTIFY_EMAIL_TO` for email notifications
-      (and the Twilio vars if SMS is wanted); add the outgoing webhook to `/.netlify/functions/notify`
+      (and the Twilio vars if SMS is wanted)
+- [ ] Netlify → Forms → Form notifications → **Outgoing webhook** pointing at
+      `https://<site>.netlify.app/.netlify/functions/notify` (form field blank). Env vars alone
+      do nothing — without this entry, submissions are stored but never notify anyone
 - [ ] Set DataForSEO creds + `GOOGLE_PLACE_ID` (Netlify env) so reviews fetch on build
 - [ ] Uncomment the GA/Partytown tags in `Layout.astro` once `gaMeasurementId` is set
 
