@@ -111,15 +111,26 @@ function buildHtml({ siteName, formLabel, fields, submittedAt, adminUrl }) {
           (file.size ? ` <span style="color:#6b7280">(${Math.round(file.size / 1024)} KB)</span>` : '')
         : escapeHtml(value).replace(/\n/g, '<br>');
       return `<tr>
-        <td style="padding:8px 12px 8px 0;vertical-align:top;color:#6b7280;white-space:nowrap">${escapeHtml(label)}</td>
+        <td class="n-label" style="padding:8px 12px 8px 0;vertical-align:top;color:#6b7280;white-space:nowrap">${escapeHtml(label)}</td>
         <td style="padding:8px 0;vertical-align:top;color:#111827">${cell}</td>
       </tr>`;
     })
     .join('');
 
   return `<!doctype html>
-<html><body style="margin:0;padding:24px;background:#f3f4f6;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5">
-  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;padding:24px 28px">
+<html><head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  /* Phones: drop the gray backdrop + card so content uses the full width. */
+  @media only screen and (max-width:600px) {
+    .n-wrap { padding:0 !important; background:#ffffff !important; }
+    .n-card { padding:4px 0 !important; border-radius:0 !important; max-width:none !important; }
+    .n-label { width:1% !important; padding-right:16px !important; }
+  }
+</style>
+</head><body style="margin:0;padding:0;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5">
+<div class="n-wrap" style="padding:24px;background:#f3f4f6">
+  <div class="n-card" style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;padding:24px 28px">
     <p style="margin:0 0 4px;color:#6b7280;font-size:13px;text-transform:uppercase;letter-spacing:.05em">${escapeHtml(siteName)}</p>
     <h1 style="margin:0 0 16px;font-size:20px;color:#111827">New ${escapeHtml(formLabel)} form submission</h1>
     <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">${rows}</table>
@@ -127,6 +138,7 @@ function buildHtml({ siteName, formLabel, fields, submittedAt, adminUrl }) {
       Received ${escapeHtml(submittedAt)}${adminUrl ? ` · <a href="${escapeHtml(adminUrl)}" style="color:#9ca3af">View in Netlify</a>` : ''}
     </p>
   </div>
+</div>
 </body></html>`;
 }
 
