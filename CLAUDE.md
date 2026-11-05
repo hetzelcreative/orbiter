@@ -188,7 +188,7 @@ Sites deploy to Netlify. `netlify.toml` configures the build, functions dir, and
   - **SMS via Twilio** — the four `TWILIO_*` / `RECIPIENT_PHONE_NUMBER` vars.
   The function has a `contact` branch and a generic fallback, so new forms notify
   automatically — add a branch in `buildSummary()` to format a specific form nicely.
-  File uploads arrive as links to the Netlify-hosted attachment (login required).
+  File uploads arrive as links to the Netlify-hosted attachment.
   **The form field `name`s are the contract** between the form and the function.
   (`send-sms.cjs` remains as an alias so older webhook URLs keep working.)
 - **Legacy redirects** (migrating off WordPress, etc.) go in `netlify.toml` as 301s.
